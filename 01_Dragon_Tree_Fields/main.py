@@ -1,18 +1,22 @@
+import time
+
+import numpy as np
+
+
 def create_column_sums(data):
     """
     data: Input matrix (a list of lists)
     returns: A matrix whose elements are the sum of the column from top row to the row of the element
     """
-    N = len(data[0])   # size of array needed to store the result
-    sum_matrix = [[] * N for i in range(N)]  # matrix to contain the result
+    N = len(data[0])  # size of array needed to store the result
 
-    sum_matrix[0] = data[0]     # first row remains the same as the input since it is the first row
+    sum_matrix = np.empty([N, N], int)
+    sum_matrix[0, :] = data[0]
 
     for row in range(1, N):
-        for col in range(N):
-            sum_matrix[row].append(data[row][col] + sum_matrix[row - 1][col])   # adding the value of current cell in
-            # the input matrix to the value of the cell above in the sum_matrix
+        sum_matrix[row, :] = data[row] + sum_matrix[row - 1]
 
+    # print(sum_matrix)
     return sum_matrix
 
 
@@ -25,24 +29,27 @@ def create_sub_matrices(data, col_sums):
     provided the sum of the sub matrix falls between q1 and q2
     """
     N = len(data[0])
-    sub_matrices_info = []   # to contain the result
+    sub_matrices_info = []  # to contain the result
+    # sub_matrices_info = np.empty([N, 5],int)
 
     for size in range(1, N):  # to iterate over all sizes from 1 to N-1
         for row in range(N - size + 1):
             for col in range(N - size + 1):
-                sum_ = []    # to help calculate sum of the sub matrix
-                for i in range(col, col + size):   # iterating over all columns of the matrix to gather sum of each column
-                    if row > 0:                    # when the row is not the first row
-                        temp = col_sums[row + size - 1][i] - col_sums[row - 1][i]  # sum of the column, starting from the first row of the sub matrix to last row of the sub matrix
-                        sum_.append(temp)   # stored the sum of each column of the sub matrix in the array
-                    else:        # if it is the first row
-                        temp1 = col_sums[row + size - 1][i]  # then there is no previous row so nothing is subtracted
-                        sum_.append(temp1)
+                if row > 0:  # when the row is not the first row
+                    sum_ = col_sums[row + size - 1, col:col + size] - col_sums[row - 1,                                                                     col:col + size]  # sum of the column, starting from the first row of the sub matrix to last row of the sub matrix
+                    # print(f"sum_ row>0: {sum_}")
+                else:  # if it is the first row
+                    sum_ = col_sums[row + size - 1,
+                           col:col + size]  # then there is no previous row so nothing is subtracted
+                    # print(f"sum_ row0: {sum_}")
 
-                sum_to_use = sum(sum_)     # summing up the sum of all the columns of the sub matrix to find the sub of the entire sub matrix
-                if q1 <= sum_to_use <= q2:   # if the sum is between the quality value
-                    sub_matrices_info.append([size, row, col, sum_to_use])  # only then the array is appended to the result
+                sum_to_use = sum(
+                    sum_)  # summing up the sum of all the columns of the sub matrix to find the sub of the entire sub matrix
+                if q1 <= sum_to_use <= q2:  # if the sum is between the quality value
+                    sub_matrices_info.append(
+                        [size, row, col, sum_to_use])  # only then the array is appended to the result
 
+    # print(sub_matrices_info)
     return sub_matrices_info
 
 
@@ -52,103 +59,163 @@ def check_overlap(first_square, second_square):
     second_square: A submatrix of a bigger matrix
     returns: True if the submatrices overlap in the bigger matrix, else false
     """
-    size1 = first_square[0]              # size of first matrix
-    size2 = second_square[0]             # size of second matrix
-    starting_row1 = first_square[1]      # starting row of first matrix
-    starting_col1 = first_square[2]      # starting col of first matrix
-    starting_row2 = second_square[1]     # starting row of second matrix
-    starting_col2 = second_square[2]     # starting col of second matrix
 
-    if starting_row1 <= starting_row2:      # if the first matrix is above the 2nd one
-        flag = (starting_col1 + size1 - 1 < starting_col2) or (starting_row1 + size1 - 1 < starting_row2)
-    elif starting_row1 >= starting_row2:    # if the first matrix is below the 2nd one
-        flag = (starting_col2 + size2 - 1 > starting_col1) or (starting_row2 + size2 - 1 > starting_row1)
-    elif starting_row1 == starting_row2:    # if both are at the same level
-        if starting_col1 <= starting_col2:  # then checking if 1st one ahead of the 2nd one
-            flag = (starting_col1 + size1 - 1 < starting_col2) or (starting_row1 + size1 - 1 < starting_row2)
-        else:                               # 2nd one is ahead of the first
-            flag = (starting_col2 + size2 - 1 > starting_col1) or (starting_row2 + size2 - 1 > starting_row1)
+    size1 = first_square[0]  # size of first matrix
+    size2 = second_square[0]  # size of second matrix
+    starting_row1 = first_square[1]  # starting row of first matrix
+    ending_row1 = starting_row1 + size1
+    starting_col1 = first_square[2]  # starting col of first matrix
+    ending_col1 = starting_col1 + size1
+    starting_row2 = second_square[1]  # starting row of second matrix
+    ending_row2 = starting_row2 + size2
+    starting_col2 = second_square[2]  # starting col of second matrix
+    ending_col2 = starting_col2 + size2
 
-    return not flag
+    # print(f"size1: {size1}")
+    # print(f"size2: {size2}")
+    # print(f"starting row1: {starting_row1}")
+    # print(f"ending_row1: {ending_row1}")
+    # print(f"starting_col1: {starting_col1}")
+    # print(f"ending_col1: {ending_col1}")
+    # print(f"starting_row2: {starting_row2}")
+    # print(f"ending_row2: {ending_row2}")
+    # print(f"starting_col2: {starting_col2}")
+    # print(f"ending_col2: {ending_col2}")
+
+    # if starting_row1 <= starting_row2:  # if the first matrix is above the 2nd one
+    #     flag = (starting_col1 + size1 - 1 < starting_col2) or (starting_row1 + size1 - 1 < starting_row2)
+    # elif starting_row1 >= starting_row2:  # if the first matrix is below the 2nd one
+    #     flag = (starting_col2 + size2 - 1 > starting_col1) or (starting_row2 + size2 - 1 > starting_row1)
+    # elif starting_row1 == starting_row2:  # if both are at the same level
+    #     if starting_col1 <= starting_col2:  # then checking if 1st one ahead of the 2nd one
+    #         flag = (starting_col1 + size1 - 1 < starting_col2) or (starting_row1 + size1 - 1 < starting_row2)
+    #     else:  # 2nd one is ahead of the first
+    #         flag = (starting_col2 + size2 - 1 > starting_col1) or (starting_row2 + size2 - 1 > starting_row1)
+
+    if starting_row1 <= starting_row2 <= ending_row1:
+        if starting_col1 < ending_col2 < ending_col1 or starting_col1 < starting_col2 < ending_col1:
+            flag = True
+        else:
+            flag = False
+    if starting_row2 <= starting_row1 <= ending_row2:
+        if starting_col2 < ending_col1 < ending_col2 or starting_col2 < starting_col1 < ending_col2:
+            flag = True
+        else:
+            flag = False
+
+    else:
+        flag = False
+
+    return  flag
 
 
 def solution(data):
-    precalculated_col_sums = create_column_sums(data)                       # pre-calculated sum of each column of the input matrix
-    sub_matrices_info = create_sub_matrices(data, precalculated_col_sums)   # the sub matrices that fall between the quality values
+    t1_creating_col_sums = time.time()
+    precalculated_col_sums = create_column_sums(data)  # pre-calculated sum of each column of the input matrix
+    t2_creating_col_sums = time.time()
 
-    # print(sub_matrices_info)
+    # print(f"Precalculated col sums: {precalculated_col_sums}")
 
-    sorted_sub_matrices = sorted(sub_matrices_info, key=lambda x: x[3], reverse=True)  # sorting (decreasing order) the sub matrices based on their sums
+    t1_creating_sub_matrices = time.time()
+    sub_matrices_info = create_sub_matrices(data,
+                                            precalculated_col_sums)  # the sub matrices that fall between the quality values
+    t2_creating_sub_matrices = time.time()
 
-    # print(sorted_sub_matrices)
+    # print(f"submatrices: {sub_matrices_info}")
 
-    # is_overlapped = check_overlap(sorted_sub_matrices[1], sorted_sub_matrices[3])   # to check overlap between 2 sub matrices
+    t1_time_to_sort_submatrices = time.time()
+    sorted_sub_matrices = sorted(sub_matrices_info, key=lambda x: x[3],
+                                 reverse=True)  # sorting (decreasing order) the sub matrices based on their sums
+    t2_time_to_sort_submatrices = time.time()
+
+    # print(f"sorted submatrices: {sorted_sub_matrices}")
+
+    # is_overlapped = check_overlap(sorted_sub_matrices[2], sorted_sub_matrices[3])   # to check overlap between 2 sub matrices
     # print(is_overlapped)
 
-    differences = []                    # to contain the differences in the sums of all non overlapping sub-matrices
+    t1_time_to_find_differences_of_non_overlapped_matrices = time.time()
+    differences = []  # to contain the differences in the sums of all non overlapping sub-matrices
     size_of_sorted = len(sorted_sub_matrices)
     for i in range(size_of_sorted):
         for j in range(i + 1, size_of_sorted):
             if check_overlap(sorted_sub_matrices[i], sorted_sub_matrices[j]):  # if sub matrices overlap, skip
                 continue
-            else:           # if sub matrices don't overlap
-                diff_ = sorted_sub_matrices[i][3] - sorted_sub_matrices[j][3]  # difference between the sums of the 2 sub matrices
-                sum_ = sorted_sub_matrices[i][3] + sorted_sub_matrices[j][3]   # sum of the sums of 2 sub matrices
-                differences.append([sorted_sub_matrices[i][3], sorted_sub_matrices[j][3], diff_, sum_]) # appending the sum of sub matrix 1, sum of sub matrix2, difference between their sums, sum of the sums of the 2 matrices
+            else:  # if sub matrices don't overlap
+                diff_ = sorted_sub_matrices[i][3] - sorted_sub_matrices[j][
+                    3]  # difference between the sums of the 2 sub matrices
+                sum_ = sorted_sub_matrices[i][3] + sorted_sub_matrices[j][3]  # sum of the sums of 2 sub matrices
+                differences.append([sorted_sub_matrices[i][3], sorted_sub_matrices[j][3], diff_,
+                                    sum_])  # appending the sum of sub matrix 1, sum of sub matrix2, difference between their sums, sum of the sums of the 2 matrices
+    t2_time_to_find_differences_of_non_overlapped_matrices = time.time()
 
-    # print(differences)
+    # print(f"differences: {differences}")
 
-    sorted_diff = sorted(differences, key=lambda x: x[2], reverse=False)  # sorting the differences matrix so that the sub matrices with lowest sums are at the starting
+    t1_sorted_differeces = time.time()
+    sorted_diff = sorted(differences, key=lambda x: x[2],
+                         reverse=False)  # sorting the differences matrix so that the sub matrices with lowest sums are at the starting
+    t2_sorted_differeces = time.time()
 
+    # print(f"sorted differneces: {sorted_diff}")
+
+    t1_checking_for_same_sums = time.time()
     checking_for_same_sums = []  # to check in case there are multiple differences with the same difference value
-    if len(sorted_diff) > 1:    # only when the differences array has more than 1 value
+    if len(sorted_diff) > 1:  # only when the differences array has more than 1 value
         i = 1
         flag = True
-        checking_for_same_sums.append(sorted_diff[0])   # the first array in the differences is added by default
+        checking_for_same_sums.append(sorted_diff[0])  # the first array in the differences is added by default
         while flag:
             if sorted_diff[i][2] == checking_for_same_sums[i - 1][2]:  # checking if the next ones have the same value
-                checking_for_same_sums.append(sorted_diff[i])          # if same then added
-                i += 1                                                 # increasing the index to see if the next one also has the same value
-            flag = False                                               # if next one is not same then flag set to false to exit the loop
+                checking_for_same_sums.append(sorted_diff[i])  # if same then added
+                i += 1  # increasing the index to see if the next one also has the same value
+            flag = False  # if next one is not same then flag set to false to exit the loop
 
-        answer_temp = sorted(checking_for_same_sums, key=lambda x: x[3], reverse=True)  # sorting the previous array based on the sums of the sub matrices so that the one with the biggest sum is at the starting
-        answer = answer_temp[0]   # answer will the one at the starting
-    else:   # if there is only one list in the differences list
-        checking_for_same_sums.append(sorted_diff[0])   # then that is the answer
+        answer_temp = sorted(checking_for_same_sums, key=lambda x: x[3],
+                             reverse=True)  # sorting the previous array based on the sums of the sub matrices so that the one with the biggest sum is at the starting
+        answer = answer_temp[0]  # answer will the one at the starting
+    else:  # if there is only one list in the differences list
+        checking_for_same_sums.append(sorted_diff[0])  # then that is the answer
         answer = checking_for_same_sums[0]
+    t2_checking_for_same_sums = time.time()
 
-    answer = sorted([answer[0], answer[1]])   # sorting to make answer more presentable
+    # print(f"Time to create col sums: {t2_creating_col_sums - t1_creating_col_sums}")
+    # print(f"Time to create sub matrices: {t2_creating_sub_matrices - t1_creating_sub_matrices}")
+    # print(f"Time to sort submatrices: {t2_time_to_sort_submatrices - t1_time_to_sort_submatrices}")
+    # print(f"Time to find differences: {t2_time_to_find_differences_of_non_overlapped_matrices - t1_time_to_find_differences_of_non_overlapped_matrices}")
+    # print(f"Time to sort the differences: {t2_sorted_differeces - t1_sorted_differeces}")
+    # print(f"Time to check same sums: {t2_checking_for_same_sums-t1_checking_for_same_sums}")
 
-    print(answer[0], answer[1])   # printing the final answer
+    answer = sorted([answer[0], answer[1]])  # sorting to make answer more presentable
+
+    print(answer[0], answer[1])  # printing the final answer
 
 
 if __name__ == "__main__":
     N_in = int(input())  # number of rows (or columns) of a square matrix
-    input_arr = [[]*N_in for i in range(N_in)]  # to contain the input matrix
+
+    input_arr = np.empty(shape=[0, N_in])
+
     for i in range(N_in):
-        input_arr[i] = input().split()    # filling up the input matrix
+        input_arr = np.append(input_arr, [input().split()], axis=0)
 
     q1, q2 = input().split()  # prescribed range of the quality
     q1 = int(q1)
     q2 = int(q2)
 
-    # Converting str to int
-    for row in input_arr:
-        row[:] = map(int, row)
+    input_arr = input_arr.astype(int)
 
-    # Testing data
-    # q1 = 40
-    # q2 = 55
-    # input_arr =  [[ 12,  14,  16,  22,  13,  10],
+    # # Testing data
+    # q1 = 70
+    # q2 = 85
+    # input_arr =  np.array([[ 12,  14,  16,  22,  13,  10],
     #         [ 10,  31,  12,  16,  15,  11],
     #         [-20,  19,  20,   5,   9,  12],
     #         [ 10,  15,  16,  16, -10,  23],
     #         [ 40,  89,  67,  30,  -5,  10],
-    #         [ 20,  34, -95,  43,  18,  30]]
+    #         [ 20,  34, -95,  43,  18,  30]])
 
-    # input_arr = [[1, 7, 3],
-    #              [0, 6, 12],
-    #              [-2, 8, 2,]]
+    # input_arr = np.array([[-1, -7, -3],
+    #              [0, -6, -12],
+    #              [-2, -8, -2,]])
 
     # input_arr = [[19, 14, 14, 19, 17],
     #              [18, 13, 12, 12, 19],
@@ -156,7 +223,7 @@ if __name__ == "__main__":
     #              [20, 12, 10, 20, 11],
     #              [17, 15, 14, 17, 19]]
 
-    # print(input_arr)
-    # print(q1, q2)
+    # # print(input_arr)
+    # # print(q1, q2)
 
-    solution(input_arr)   # calling solution
+    solution(input_arr)  # calling solution

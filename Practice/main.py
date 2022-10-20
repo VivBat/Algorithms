@@ -1,3 +1,20 @@
+"""
+Coin Change
+
+A few different values of coins are given.
+It is supposed that unlimited number of coins of each  value is available.
+Also, a particular monetary value is given.
+The problem is to list all different possibilities
+of expressing the given value as a sum of given coins.
+Example.  Coin values = [5, 2, 1], monetary value = 7.
+          Possible changes     1. 7 = 5+2
+                               2. 7 = 5+1+1
+                               3. 7 = 2+2+2+1
+                               4. 7 = 2+2+1+1+1
+                               5. 7 = 2+1+1+1+1+1
+"""
+
+
 class Node:
     def __init__(self, key, coin_used=None, child_node1=None, child_node2=None, child_node3=None):
         self.key = key
@@ -70,7 +87,13 @@ if __name__ == "__main__":
     coins = [5, 2, 1]
     local_coins = []
     coins_used = []
-    child_count_on_node = len(coins)
+    # child_count_on_node = len(coins)
+
+    child_nodes = []
+    for i in range(1, len(coins)+1):
+        child_nodes.append(("child_node" + str(i)))
+
+    # print(child_nodes)
     monetary_val = 7
     tree = Tree(monetary_val)
     tree.build_tree(tree.root)

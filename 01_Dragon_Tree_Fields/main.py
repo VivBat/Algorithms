@@ -82,16 +82,6 @@ def check_overlap(first_square, second_square):
     # print(f"starting_col2: {starting_col2}")
     # print(f"ending_col2: {ending_col2}")
 
-    # if starting_row1 <= starting_row2:  # if the first matrix is above the 2nd one
-    #     flag = (starting_col1 + size1 - 1 < starting_col2) or (starting_row1 + size1 - 1 < starting_row2)
-    # elif starting_row1 >= starting_row2:  # if the first matrix is below the 2nd one
-    #     flag = (starting_col2 + size2 - 1 > starting_col1) or (starting_row2 + size2 - 1 > starting_row1)
-    # elif starting_row1 == starting_row2:  # if both are at the same level
-    #     if starting_col1 <= starting_col2:  # then checking if 1st one ahead of the 2nd one
-    #         flag = (starting_col1 + size1 - 1 < starting_col2) or (starting_row1 + size1 - 1 < starting_row2)
-    #     else:  # 2nd one is ahead of the first
-    #         flag = (starting_col2 + size2 - 1 > starting_col1) or (starting_row2 + size2 - 1 > starting_row1)
-
     if starting_row1 <= starting_row2 <= ending_row1:
         if starting_col1 < ending_col2 < ending_col1 or starting_col1 < starting_col2 < ending_col1:
             flag = True
@@ -177,12 +167,12 @@ def solution(data):
         answer = checking_for_same_sums[0]
     t2_checking_for_same_sums = time.time()
 
-    # print(f"Time to create col sums: {t2_creating_col_sums - t1_creating_col_sums}")
-    # print(f"Time to create sub matrices: {t2_creating_sub_matrices - t1_creating_sub_matrices}")
-    # print(f"Time to sort submatrices: {t2_time_to_sort_submatrices - t1_time_to_sort_submatrices}")
-    # print(f"Time to find differences: {t2_time_to_find_differences_of_non_overlapped_matrices - t1_time_to_find_differences_of_non_overlapped_matrices}")
-    # print(f"Time to sort the differences: {t2_sorted_differeces - t1_sorted_differeces}")
-    # print(f"Time to check same sums: {t2_checking_for_same_sums-t1_checking_for_same_sums}")
+    print(f"Time to create col sums: {t2_creating_col_sums - t1_creating_col_sums}")
+    print(f"Time to create sub matrices: {t2_creating_sub_matrices - t1_creating_sub_matrices}")
+    print(f"Time to sort submatrices: {t2_time_to_sort_submatrices - t1_time_to_sort_submatrices}")
+    print(f"Time to find differences: {t2_time_to_find_differences_of_non_overlapped_matrices - t1_time_to_find_differences_of_non_overlapped_matrices}")
+    print(f"Time to sort the differences: {t2_sorted_differeces - t1_sorted_differeces}")
+    print(f"Time to check same sums: {t2_checking_for_same_sums-t1_checking_for_same_sums}")
 
     answer = sorted([answer[0], answer[1]])  # sorting to make answer more presentable
 

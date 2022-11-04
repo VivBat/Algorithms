@@ -1,5 +1,5 @@
-import queue
 import numpy as np
+
 
 class Node:
     def __init__(self, color, label, parent=None, left_child=None, right_child=None):
@@ -16,11 +16,13 @@ class Node:
             if self.subtree_color_count[j][0] == D:
                 self.full.append(j)
 
+
 class BinaryTree:
     def __init__(self, root):
         self.root = root
 
-    def build_tree(self, node_a, node_b): # node_a = label of parent, node_b = label of child, i.e node_a is the parent of node_b
+    def build_tree(self, node_a,
+                   node_b):  # node_a = label of parent, node_b = label of child, i.e node_a is the parent of node_b
         nodes[node_b].parent = nodes[node_a]
 
         if nodes[node_a].left_child is None:
@@ -29,15 +31,12 @@ class BinaryTree:
             nodes[node_a].right_child = nodes[node_b]
 
     def count_colors(self, node):
-        if node.left_child is None and node.right_child is None:
+        if node.left_child is None and node.right_child is None:  # if the node is a leaf
+            node.subtree_color_count[node.color][0] += 1  # increment the count of color of the node
             return
 
-        if node.left_child is not None:
-            node.subtree_color_count[node.left_child.color][0] += 1
-
-        if node.right_child is not None:
-            node.subtree_color_count[node.right_child.color][0] += 1
-
+        if node is not None:
+            node.subtree_color_count[node.color][0] += 1  # increment the count of the color of the node
 
         if node.left_child is not None:
             self.count_colors(node.left_child)
@@ -46,104 +45,92 @@ class BinaryTree:
             self.count_colors(node.right_child)
             node.subtree_color_count += node.right_child.subtree_color_count
 
+    def find_all_paths(self, node):
+        """
+        Finds all the paths from the root to the leaves in the tree
+        :param node: a node of the tree
+        :return: Updates the global list containing all the paths
+        """
+        global full_paths
+        if node.left_child is None and node.right_child is None:
+            paths.append(node)  # append the leaf to the path
+            all_paths.append(
+                paths.copy())  # finally append the entire path to the array containing all the paths in the tree
+            paths.pop()
+            return
+
+        paths.append(node)  # append the node to the current path (collecting nodes)
+
+        if node.left_child:
+            self.find_all_paths(node.left_child)
+        if node.right_child:
+            self.find_all_paths(node.right_child)
+
+        paths.pop()
 
 
-# # ........................................................................
-#     #   S E R V I C E   M E T H O D S    (mainly printing)
-#     def countNodes(self, node):
-#         if node == None: return 0
-#         return 1 + self.countNodes(node.left) + self.countNodes(node.right)
-#
-#     # calculates x coord = node order of in Inorder traversal
-#     def setXcoord(self, node, x_coord):
-#         if node == None: return x_coord
-#         node.xcoord = self.setXcoord(node.left, x_coord) + 1
-#         # print(node.key, node.setXcoord)
-#         return self.setXcoord(node.right, node.xcoord)
-#
-#     def display(self):
-#         self.setXcoord(self.root, 0)
-#         qu = queue.Queue()
-#         prevDepth = -1
-#         prevEndX = -1
-#         # in the queue store pairs(node, its depth)
-#         qu.put((self.root, 0))
-#         while not qu.empty():
-#             node, nodeDepth = qu.get()
-#
-#             LbranchSize = RbranchSize = 0
-#             if node.left != None:
-#                 LbranchSize = (node.xcoord - node.left.xcoord)
-#                 qu.put((node.left, nodeDepth + 1))
-#             if node.right != None:
-#                 RbranchSize = (node.right.xcoord - node.xcoord)
-#                 qu.put((node.right, nodeDepth + 1))
-#
-#             LspacesSize = (node.xcoord - LbranchSize) - 1  # if first on a line
-#             if prevDepth == nodeDepth:  # not first on line
-#                 LspacesSize -= prevEndX
-#
-#             # print the node, branches, leading spaces
-#             if prevDepth < nodeDepth and prevDepth > -1: print()  # next depth occupies new line
-#             nodelen = 3
-#             print(" " * nodelen * LspacesSize, end='')
-#             print("_" * nodelen * LbranchSize, end='')
-#             # print( "." + ("%2d"%node.key) + node.tag+".", end = '' )
-#             print(node.tag + ("%2d" % node.key), end='')
-#             print("_" * nodelen * RbranchSize, end='')
-#
-#             # used in the next run of the loop:
-#             prevEndX = node.xcoord + RbranchSize
-#             prevDepth = nodeDepth
-#         # end of queue processing
-#
-#         N = self.countNodes(self.root)
-#         print("\n" + '-' * N * nodelen)  # finish the last line of the tree
-#----------------------------------------------------------------------------------------------
+def find_full_paths(path):
+    """
+    Finds all the "full-paths"
+    :param path: a path from the root to a leaf
+    :return: Updates the global list containing "full-paths"
+    """
+    local_full_path = []
+    for node in path:
+        for colors in node.full:
+            if colors not in local_full_path:
+                local_full_path += [colors]
+
+    if len(local_full_path) == C:
+        full_paths.append(local_full_path)
+
 
 def make_all_nodes(colors_list):
-
+    """
+    Makes all the nodes of the tree
+    :param colors_list: List containing the color of each node in the tree
+    :return: Prepares the nodes of the tree
+    """
     for i in range(len(colors_list)):
         nodes.append(Node(color=colors_list[i], label=i))
 
 
-if __name__ == "__main__":
-    # N,C,D = input().split()
-    #
-    # N = int(N)
-    # C = int(C)
-    # D = int(D)
-    #
-    # colors_of_all_nodes = (input().split())
-    # colors_of_all_nodes = list(map(int, colors_of_all_nodes))
+def solution():
+    make_all_nodes(colors_of_all_nodes)  # make all the nodes of the tree
 
-    nodes = []  # to contain all the nodes
-
-    # test example 1
-    N, C, D = 25, 3, 4
-    colors_of_all_nodes = [0, 2, 0, 0, 0, 1, 1, 2, 0, 0, 2, 0, 1, 2, 2, 1, 2, 2, 2, 2, 0, 2, 2, 0, 0]
-
-
-    # test example 2
-    # N, C, D = 6, 5, 1
-    # colors_of_all_nodes = [0, 1, 2, 3, 4, 4]
-
-    make_all_nodes(colors_of_all_nodes)
-
-    tree = BinaryTree(nodes[0])
-    for i in range(N-1):
+    tree = BinaryTree(nodes[0])  # nodes[0] -> root of the tree
+    for i in range(N - 1):
         a, b = input().split()
         a = int(a)
         b = int(b)
-        tree.build_tree(a, b)
-
-    # tree.display()
+        tree.build_tree(a, b)  # Build the tree using all the prepared nodes
 
     tree.count_colors(nodes[0])
 
     for node in nodes:
         node.is_full()
 
-    print("done!")
-    print("done!")
+    tree.find_all_paths(nodes[0])  # finding all the paths in the tree from the root to the leaves
 
+    for path in all_paths:  # finding which paths are "full-path" from all the paths
+        find_full_paths(path)
+
+    print(len(full_paths))  # printing only the count of the full-paths
+
+
+if __name__ == "__main__":
+    N, C, D = input().split()
+
+    N = int(N)
+    C = int(C)
+    D = int(D)
+
+    colors_of_all_nodes = (input().split())
+    colors_of_all_nodes = list(map(int, colors_of_all_nodes))
+
+    nodes = []  # to contain all the nodes
+    all_paths = []  # to contain all the routes in the tree
+    paths = []  # to temporarily hold a local path in the tree
+    full_paths = []  # to contain all the "full-paths" in the tree
+
+    solution()

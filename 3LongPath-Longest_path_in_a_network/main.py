@@ -1,3 +1,4 @@
+import time
 class Node:
     def __init__(self, key=None, parent=None):
         self.key = key
@@ -68,17 +69,34 @@ class Tree:
 
 
 def solution(in_str):
-    root = Node(int(in_str[1]))  # extracting the root of the tree
+    # extracting root from the string
+    rootVal = ''
+    i = 0
+    while in_str[i + 1] != "(" and in_str[i + 1] != ")":  # to extract the number from the string
+        rootVal += in_str[i + 1]
+        i += 1
+
+    root = Node(int(rootVal))  # extracting the root of the tree
     tree = Tree(in_str)
+
+    t1_tree_building = time.time()
     tree.build_tree(root)    # building the tree
+    t2_tree_building = time.time()
+
+    t1_collecting_sums = time.time()
     tree.collect_sums(root)
+    t2_collecting_sums = time.time()
+
+    # print(f"time to build the tree: {t2_tree_building-t1_tree_building}")
+    # print(f"time to collect sums: {t2_collecting_sums - t1_collecting_sums}")
 
 
 if __name__ == "__main__":
-    # input_string = "(5(14(1(19)(2(10(8)))(3(5)(12(4)))(20))(4(17)(15)))(10(21(44)(13(35)(5(34)(4))(2(23)))(55(8)))(12(9)(10(6)(5(11))(4)))))"
+    # input_string = "(5(14(1(19)(2(10(8)))(3(5)(12(4)))(20))(4(17)(15)))(10(21(44)(13(35)(5(34)(4))(2(23)))(55(8)))(
+    # 12(9)(10(6)(5(11))(4)))))"
+    # input_string = "(93(5))"
 
     input_string = input()
-
     sums = []  # global variable to store sums of all the paths with maximum possible costs
 
     solution(input_string)
